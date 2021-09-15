@@ -6,9 +6,35 @@
     <!-- d3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <!-- current file -->
+    <style>
+        .axis>* {
+            stroke: white
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body
+    style="background-color: #242526; font-family: 'Noto Sans';font-size: 22px;color: white; padding: 100px; padding-left: 135px">
+
+    <div style="border-bottom: 2px solid white;padding-bottom: 50px">
+        <p style="font-style: normal;
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 33px;
+    letter-spacing: 0.5em;
+    ">DATAVIZ AS <span style="font-weight: bold">SPECULATION</span>
+            <p>
+                <p style="font-family: Noto Sans;
+            font-style: normal;
+            font-weight: normal;
+            font-size: 24px;
+            line-height: 33px;
+            letter-spacing: 0.1em;">SENTIMENT ANALYSIS <span style="font-weight: 900">OPEN ACCESS</span> GERMANY 2009 -
+                    2021</p>
+    </div>
     <div style="display: flex">
         <div id="sents"></div>
         <div id="mags"></div>
@@ -50,16 +76,16 @@
                 .style("position", "absolute")
                 .attr("class", "tooltip")
                 .style("background-color", "white")
-                .style("border", "solid")
-                .style("border-width", "1px")
-                .style("border-radius", "5px")
+                .style("color", "black")
+                .style("font-size", "12px")
                 .style("padding", "10px")
+                .style("box-shadow", "8px 5px 5px black")
 
             // A function that change this tooltip when the user hover a point.
             // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
             var mouseover = function (d) {
                 tooltip
-                    .style("opacity", 1)
+                    .style("opacity", 0.9)
             }
 
             var mousemove = function (e, d) {
@@ -83,6 +109,7 @@
                 .range([25, 555]);
             svg.append("g")
                 .attr("transform", "translate(0," + height / 2 + ")")
+                .attr("class", "axis")
                 .call(d3.axisBottom(xScale));
 
             // Add Y axis
@@ -91,6 +118,7 @@
                 .range([height, 0]);
             svg.append("g")
                 .attr("transform", "translate(25, 0)")
+                .attr("class", "axis")
                 .call(d3.axisLeft(yScale));
 
             svg.append('g')
@@ -128,6 +156,7 @@
                 .range([25, 555]);
             svg.append("g")
                 .attr("transform", "translate(0," + height + ")")
+                .attr("class", "axis")
                 .call(d3.axisBottom(xScale2));
 
             // Add Y axis
@@ -136,6 +165,7 @@
                 .range([height, 0]);
             svg.append("g")
                 .attr("transform", "translate(25, 0)")
+                .attr("class", "axis")
                 .call(d3.axisLeft(yScale2));
 
             svg.append('g')
