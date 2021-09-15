@@ -9,14 +9,17 @@
 </head>
 
 <body>
-    <div id="graph"></div>
+    <div style="display: flex">
+        <div id="sents"></div>
+        <div id="mags"></div>
+    </div>
+
     <script>
         d3.json('data/json/res_file.json').then(data => {
             console.log(data)
 
             data = data.data
             console.log(data)
-
             d3.selectAll("svg > *").remove();
 
             // set the dimensions and margins of the graph
@@ -25,7 +28,7 @@
                 height = 400 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
-            var svg = d3.select("#graph")
+            var svg = d3.select("#sents")
                 .append("svg")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
@@ -41,7 +44,7 @@
 
             // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
             // Its opacity is set to 0: we don't see it by default.
-            var tooltip = d3.select("#graph")
+            var tooltip = d3.select("#sents")
                 .append("div")
                 .style("opacity", 0)
                 .style("position", "absolute")
@@ -79,7 +82,7 @@
                 .domain(d3.extent(dates))
                 .range([25, 555]);
             svg.append("g")
-                .attr("transform", "translate(0," + height + ")")
+                .attr("transform", "translate(0," + height / 2 + ")")
                 .call(d3.axisBottom(xScale));
 
             // Add Y axis
@@ -87,6 +90,7 @@
                 .domain([-0.2, 0.2])
                 .range([height, 0]);
             svg.append("g")
+                .attr("transform", "translate(25, 0)")
                 .call(d3.axisLeft(yScale));
 
             svg.append('g')
@@ -103,6 +107,51 @@
                 .attr("cy", function (d) { return yScale(d.sentiment_score); })
                 .attr("r", 4)
                 .style("fill", "#69b3a2")
+                .style("opacity", 0.8)
+                .on("mouseover", mouseover)
+                .on("mousemove", mousemove)
+                .on("mouseleave", mouseleave)
+
+            // SAME BUT FOR MAGNITUDES
+            // append the svg object to the body of the page
+            var svg = d3.select("#mags")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+            // Add X axis
+            var xScale2 = d3.scaleTime()
+                .domain(d3.extent(dates))
+                .range([25, 555]);
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(xScale2));
+
+            // Add Y axis
+            var yScale2 = d3.scaleLinear()
+                .domain([0, 1])
+                .range([height, 0]);
+            svg.append("g")
+                .attr("transform", "translate(25, 0)")
+                .call(d3.axisLeft(yScale2));
+
+            svg.append('g')
+                .selectAll("dot")
+                .data(data).exit().remove();
+
+            // Add dots
+            svg.append('g')
+                .selectAll("dot")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("cx", function (d) { return xScale2(Date.parse(d.created)); })
+                .attr("cy", function (d) { return yScale2(d.magnitude_score); })
+                .attr("r", 4)
+                .style("fill", "#b026ff")
                 .style("opacity", 0.8)
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
