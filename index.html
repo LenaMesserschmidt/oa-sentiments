@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>OA Sentiments</title>
+    <!-- d3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- current file -->
+</head>
+
+<body>
+    <div id="graph"></div>
+    <script>
+        d3.json('data/json/res_file.json').then(data => {
+            console.log(data)
+
+            data = data.data
+
+            d3.selectAll("svg > *").remove();
+
+            // set the dimensions and margins of the graph
+            var margin = { top: 10, right: 30, bottom: 30, left: 60 },
+                width = 460 - margin.left - margin.right,
+                height = 400 - margin.top - margin.bottom;
+
+            // append the svg object to the body of the page
+            var svg = d3.select("#graph")
+                .append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform",
+                    "translate(" + margin.left + "," + margin.top + ")");
+
+            var dates = [];
+            for (var i = 0; i < data.length; i++) {
+                var obj = data[i];
+                dates.push(Date.parse(obj.created));
+            }
+
+
+
+            // Add X axis
+            var xScale = d3.scaleTime()
+                .domain(d3.extent(dates))
+                .range([25, 555]);
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(xScale));
+
+            // Add Y axis
+            var yScale = d3.scaleLinear()
+                .domain([-0.2, 0.2])
+                .range([height, 0]);
+            svg.append("g")
+                .call(d3.axisLeft(yScale));
+
+            svg.append('g')
+                .selectAll("dot")
+                .data(data).exit().remove();
+
+            // Add dots
+            svg.append('g')
+                .selectAll("dot")
+                .data(data)
+                .enter()
+                .append("circle")
+                .attr("cx", function (d) { return xScale(Date.parse(d.created)); })
+                .attr("cy", function (d) { return yScale(d.sentiment_score); })
+                .attr("r", 2.5)
+                .style("fill", "#69b3a2")
+        })</script>
+</body>
+
+</html>
