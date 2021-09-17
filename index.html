@@ -8,7 +8,7 @@
     <!-- current file -->
     <style>
         .axis>* {
-            stroke: white
+            stroke: #e5e5e5
         }
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <body
     style="background-color: #242526; font-family: 'Noto Sans';font-size: 22px;color: white; padding: 100px; padding-left: 135px">
 
-    <div style="border-bottom: 2px solid white;padding-bottom: 50px">
+    <div style="border-bottom: 2px solid white;padding-bottom: 50px;margin-bottom:50px">
         <p style="font-style: normal;
     font-weight: normal;
     font-size: 24px;
@@ -37,7 +37,6 @@
     </div>
     <div style="display: flex">
         <div id="sents"></div>
-        <div id="mags"></div>
     </div>
 
     <script>
@@ -50,8 +49,8 @@
 
             // set the dimensions and margins of the graph
             var margin = { top: 10, right: 30, bottom: 30, left: 60 },
-                width = 460 - margin.left - margin.right,
-                height = 400 - margin.top - margin.bottom;
+                width = 920 - margin.left - margin.right,
+                height = 500 - margin.top - margin.bottom;
 
             // append the svg object to the body of the page
             var svg = d3.select("#sents")
@@ -91,8 +90,8 @@
             var mousemove = function (e, d) {
                 tooltip
                     .html("source: " + d["from"])
-                    .style("left", (e.clientX + 45) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
-                    .style("top", (e.clientY) + "px")
+                    .style("left", (e.pageX + 45) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+                    .style("top", (e.pageY) + "px")
             }
 
             // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
@@ -106,7 +105,7 @@
             // Add X axis
             var xScale = d3.scaleTime()
                 .domain(d3.extent(dates))
-                .range([25, 555]);
+                .range([25, 830]);
             svg.append("g")
                 .attr("transform", "translate(0," + height / 2 + ")")
                 .attr("class", "axis")
@@ -119,7 +118,7 @@
             svg.append("g")
                 .attr("transform", "translate(25, 0)")
                 .attr("class", "axis")
-                .call(d3.axisLeft(yScale));
+                .call(d3.axisLeft(yScale).ticks(2));
 
             svg.append('g')
                 .selectAll("dot")
@@ -133,59 +132,24 @@
                 .append("circle")
                 .attr("cx", function (d) { return xScale(Date.parse(d.created)); })
                 .attr("cy", function (d) { return yScale(d.sentiment_score); })
-                .attr("r", 4)
-                .style("fill", "#69b3a2")
-                .style("opacity", 0.8)
+                .attr("r", function (d) { return 10 * d.magnitude_score })
+                .style("fill", function (d) {
+                    switch (d.from) {
+                        case "reuss": return "#fffefe"
+                        case "sz": return "#d672a5"
+                        case "faz": return "#71bc97"
+                        case "spiegel": return "#8cd0e1"
+                        case "heise": return "#f7b267"
+                        case "tagesspiegel": return "#662c91"
+                        default: return "#e5e5e5"
+                    }
+                })
+                .style("opacity", function (d) { return d.magnitude_score })
                 .on("mouseover", mouseover)
                 .on("mousemove", mousemove)
                 .on("mouseleave", mouseleave)
 
-            // SAME BUT FOR MAGNITUDES
-            // append the svg object to the body of the page
-            var svg = d3.select("#mags")
-                .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-                .append("g")
-                .attr("transform",
-                    "translate(" + margin.left + "," + margin.top + ")");
 
-            // Add X axis
-            var xScale2 = d3.scaleTime()
-                .domain(d3.extent(dates))
-                .range([25, 555]);
-            svg.append("g")
-                .attr("transform", "translate(0," + height + ")")
-                .attr("class", "axis")
-                .call(d3.axisBottom(xScale2));
-
-            // Add Y axis
-            var yScale2 = d3.scaleLinear()
-                .domain([0, 1])
-                .range([height, 0]);
-            svg.append("g")
-                .attr("transform", "translate(25, 0)")
-                .attr("class", "axis")
-                .call(d3.axisLeft(yScale2));
-
-            svg.append('g')
-                .selectAll("dot")
-                .data(data).exit().remove();
-
-            // Add dots
-            svg.append('g')
-                .selectAll("dot")
-                .data(data)
-                .enter()
-                .append("circle")
-                .attr("cx", function (d) { return xScale2(Date.parse(d.created)); })
-                .attr("cy", function (d) { return yScale2(d.magnitude_score); })
-                .attr("r", 4)
-                .style("fill", "#b026ff")
-                .style("opacity", 0.8)
-                .on("mouseover", mouseover)
-                .on("mousemove", mousemove)
-                .on("mouseleave", mouseleave)
         })</script>
 </body>
 
